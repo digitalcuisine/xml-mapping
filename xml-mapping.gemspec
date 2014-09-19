@@ -10,12 +10,11 @@ Gem::Specification.new do |s|
   s.summary = "XML-Object mapper for Ruby"
   s.description =
       "An easy to use, extensible library for semi-automatically mapping Ruby objects to XML and back. Includes an XPath interpreter."
-  s.files += FILES_RDOC_EXTRA
-  s.files += FILES_RDOC_INCLUDES
+
   s.files += `git ls-files lib test`.split("\n")
   s.files += %w{LICENSE Rakefile}
-  s.extra_rdoc_files = FILES_RDOC_EXTRA
-  s.rdoc_options += %w{--include examples}
+
+
   s.require_path = 'lib'
   s.add_development_dependency 'rake', '~> 0'
   s.test_file = 'test/all_tests.rb'
