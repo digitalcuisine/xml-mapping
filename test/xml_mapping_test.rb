@@ -46,6 +46,22 @@ class XmlMappingTest < Test::Unit::TestCase
     assert_equal 18, @c.offices[1].address.number
   end
 
+  def test_int_node_default_value
+    require 'number'
+    xml = REXML::Document.new(File.new(File.dirname(__FILE__) + "/fixtures/number.xml"))
+
+    assert_raise RuntimeError, 'No default value for empty numeric value' do
+      Number.load_from_xml(xml.root, :mapping => :no_default)
+    end
+
+    num = nil
+    assert_nothing_raised do
+      num = Number.load_from_xml(xml.root, :mapping => :with_default)
+    end
+
+    assert_equal 0, num.value
+  end
+
   def test_getter_boolean_node
     path=XML::XXPath.new("offices/office[2]/classified")
     assert_equal(path.first(@xml.root).text == "yes",
@@ -189,22 +205,22 @@ class XmlMappingTest < Test::Unit::TestCase
     @c.ent2 = "lalala"
     assert_equal "lalala", REXML::XPath.first(@c.save_to_xml, "arrtest/entry[2]").text
   end
-  
-  
+
+
   def test_setter_array_node
     xml=@c.save_to_xml
     assert_equal ["pencils", "weapons of mass destruction"],
           XML::XXPath.new("offices/office/@speciality").all(xml).map{|n|n.text}
   end
-  
-  
+
+
   def test_setter_hash_node
     xml=@c.save_to_xml
     assert_equal @c.customers.keys.sort,
           XML::XXPath.new("customers/customer/@uid").all(@xml.root).map{|n|n.text}.sort
   end
-  
-  
+
+
   def test_setter_boolean_node
     @c.offices[0].classified = !@c.offices[0].classified
     xml=@c.save_to_xml
