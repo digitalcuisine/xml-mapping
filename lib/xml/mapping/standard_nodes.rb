@@ -6,7 +6,7 @@ module XML
   module Mapping
 
     # Node factory function synopsis:
-    # 
+    #
     #   text_node :_attrname_, _path_ [, :default_value=>_obj_]
     #                                 [, :optional=>true]
     #                                 [, :mapping=>_m_]
@@ -34,7 +34,7 @@ module XML
     end
 
     # Node factory function synopsis:
-    # 
+    #
     #   numeric_node :_attrname_, _path_ [, :default_value=>_obj_]
     #                                    [, :optional=>true]
     #                                    [, :mapping=>_m_]
@@ -48,14 +48,22 @@ module XML
         @path = XML::XXPath.new(path)
         args
       end
+
       def extract_attr_value(xml) # :nodoc:
         txt = default_when_xpath_err{ @path.first(xml).text }
-        begin
-          Integer(txt)
-        rescue ArgumentError
-          Float(txt)
+
+        if txt.nil? or txt.empty?
+          raise 'No default value for empty numeric value' if @options[:default_value].nil?
+          @options[:default_value]
+        else
+          begin
+            Integer(txt)
+          rescue ArgumentError
+            Float(txt)
+          end
         end
       end
+
       def set_attr_value(xml, value) # :nodoc:
         raise RuntimeError, "Not an integer: #{value}" unless Numeric===value
         @path.first(xml,:ensure_created=>true).text = value.to_s
@@ -136,7 +144,7 @@ module XML
     require 'xml/mapping/core_classes_mapping'
 
     # Node factory function synopsis:
-    # 
+    #
     #   object_node :_attrname_, _path_ [, :default_value=>_obj_]
     #                                   [, :optional=>true]
     #                                   [, :class=>_c_]
@@ -171,7 +179,7 @@ module XML
     end
 
     # Node factory function synopsis:
-    # 
+    #
     #   boolean_node :_attrname_, _path_,
     #                _true_value_, _false_value_ [, :default_value=>_obj_]
     #                                            [, :optional=>true]
@@ -202,7 +210,7 @@ module XML
     end
 
     # Node factory function synopsis:
-    # 
+    #
     #   array_node :_attrname_, _per_arrelement_path_
     #                     [, :default_value=>_obj_]
     #                     [, :optional=>true]
@@ -290,7 +298,7 @@ module XML
 
 
     # Node factory function synopsis:
-    # 
+    #
     #   hash_node :_attrname_, _per_hashelement_path_, _key_path_
     #                     [, :default_value=>_obj_]
     #                     [, :optional=>true]
@@ -383,14 +391,14 @@ module XML
             # mechanism (a flag with dynamic scope probably) to tell
             # the node factory fcn not to add the node to the
             # xml_mapping_nodes
-            @owner.xml_mapping_nodes(:mapping=>@mapping).delete arg 
+            @owner.xml_mapping_nodes(:mapping=>@mapping).delete arg
             path=nil
           end
         end
 
         raise XML::MappingError, "node missing at end of argument list" unless path.nil?
         raise XML::MappingError, "no choices were supplied" if @choices.empty?
-        
+
         []
       end
 
